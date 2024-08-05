@@ -5,7 +5,6 @@ import { ColorForm } from "../ColorForm/ColorForm";
 export default function Color({ color, onDelete, onUpdate }) {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
-
   function toggleDelete() {
     setDeleteVisible(!deleteVisible);
   }
