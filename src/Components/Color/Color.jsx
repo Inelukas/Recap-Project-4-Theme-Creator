@@ -1,10 +1,12 @@
 import { useState } from "react";
 import "./Color.css";
 import { ColorForm } from "../ColorForm/ColorForm";
+import { CopyToCliboard } from "../CopyToClipboard/CopyToClipboard";
 
 export default function Color({ color, onDelete, onUpdate }) {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
+
   function toggleDelete() {
     setDeleteVisible(!deleteVisible);
   }
@@ -27,6 +29,7 @@ export default function Color({ color, onDelete, onUpdate }) {
       }}
     >
       <h3 className="color-card-hightlight">{color.hex}</h3>
+      <CopyToCliboard color={color} />
       <h4>{color.role}</h4>
       <p>contrast: {color.contrast}</p>
       {!deleteVisible ? (
