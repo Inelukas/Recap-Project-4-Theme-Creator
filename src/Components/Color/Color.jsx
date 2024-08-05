@@ -1,11 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Color.css";
 import { ColorForm } from "../ColorForm/ColorForm";
 import { CopyToCliboard } from "../CopyToClipboard/CopyToClipboard";
 
-export default function Color({ color, onDelete, onUpdate }) {
+export default function Color({ color, onDelete, onUpdate, onContrast }) {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
+  const [contrast, setContrast] = useState("");
+
+  useEffect(() => {
+    async function fetchContrast() {
+      const contrastRating = await onContrast(color);
+      setContrast(contrastRating);
+    }
+
+    fetchContrast();
+  }, [color, onContrast]);
 
   function toggleDelete() {
     setDeleteVisible(!deleteVisible);
@@ -32,6 +42,7 @@ export default function Color({ color, onDelete, onUpdate }) {
       <CopyToCliboard color={color} />
       <h4>{color.role}</h4>
       <p>contrast: {color.contrast}</p>
+      {<p>Overall Contrast Score: {contrast}</p>}
       {!deleteVisible ? (
         <button onClick={toggleDelete}>DELETE</button>
       ) : (

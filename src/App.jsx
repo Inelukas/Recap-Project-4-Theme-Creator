@@ -10,6 +10,24 @@ function App() {
     defaultValue: initialColors,
   });
 
+  async function handleContrast(color) {
+    async function postFetch() {
+      const response = await fetch(
+        "https://www.aremycolorsaccessible.com/api/are-they",
+        {
+          method: "POST",
+          body: JSON.stringify({ colors: [color.hex, color.contrast] }),
+        }
+      ).then((response) => response.json());
+      return response.overall;
+    }
+
+    if (color.hex !== "" && color.contrast !== "") {
+      const contrastRating = await postFetch();
+      return contrastRating;
+    }
+  }
+
   function addNewColor(newColor) {
     setColors((prevColors) => {
       return [{ ...newColor, id: uid() }, ...prevColors];
@@ -31,6 +49,7 @@ function App() {
       );
     });
   }
+
   return (
     <>
       <ColorForm handleSubmit={addNewColor} buttonName="ADD COLOR" />
@@ -45,6 +64,7 @@ function App() {
               color={color}
               onDelete={handleDelete}
               onUpdate={handleUpdate}
+              onContrast={handleContrast}
             />
           );
         })
