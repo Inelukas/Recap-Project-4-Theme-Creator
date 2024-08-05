@@ -12,14 +12,33 @@ function App() {
       return [{ ...newColor, id: uid() }, ...prevColors];
     });
   }
+
+  function handleDelete(id) {
+    setColors(
+      colors.filter((color) => {
+        return color.id !== id;
+      })
+    );
+  }
   return (
     <>
       <ColorForm handleSubmit={handleSubmit} />
       <h1>Theme Creator</h1>
 
-      {colors.map((color) => {
-        return <Color key={color.id} color={color} />;
-      })}
+      {colors.length > 0 ? (
+        colors.map((color) => {
+          return (
+            <Color
+              key={color.id}
+              id={color.id}
+              color={color}
+              onDelete={handleDelete}
+            />
+          );
+        })
+      ) : (
+        <p>No colors.. start by adding one!</p>
+      )}
     </>
   );
 }
