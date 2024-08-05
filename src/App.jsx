@@ -7,7 +7,8 @@ import { uid } from "uid";
 
 function App() {
   const [colors, setColors] = useState(initialColors);
-  function handleSubmit(newColor) {
+
+  function addNewColor(newColor) {
     setColors((prevColors) => {
       return [{ ...newColor, id: uid() }, ...prevColors];
     });
@@ -20,9 +21,17 @@ function App() {
       })
     );
   }
+
+  function handleUpdate(updatedColor) {
+    setColors((prevColors) => {
+      return prevColors.map((color) =>
+        color.id === updatedColor.id ? updatedColor : color
+      );
+    });
+  }
   return (
     <>
-      <ColorForm handleSubmit={handleSubmit} />
+      <ColorForm handleSubmit={addNewColor} buttonName="ADD COLOR" />
       <h1>Theme Creator</h1>
 
       {colors.length > 0 ? (
@@ -33,6 +42,7 @@ function App() {
               id={color.id}
               color={color}
               onDelete={handleDelete}
+              onUpdate={handleUpdate}
             />
           );
         })
