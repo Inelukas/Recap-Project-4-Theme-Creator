@@ -1,13 +1,22 @@
-import { initialColors } from "./lib/colors";
+import { colorThemeArray } from "./lib/colors";
 import Color from "./Components/Color/Color";
 import "./App.css";
 import { ColorForm } from "./Components/ColorForm/ColorForm";
 import { uid } from "uid";
 import useLocalStorageState from "use-local-storage-state";
+import { ThemeForm } from "./Components/ThemeForm/ThemeForm";
 
 function App() {
+  const [colorThemes, setColorThemes] = useLocalStorageState("colorThemes", {
+    defaultValue: colorThemeArray,
+  });
+
+  const [currentTheme, setCurrentTheme] = useLocalStorageState("currentTheme", {
+    defaultValue: "Default Theme",
+  });
+
   const [colors, setColors] = useLocalStorageState("colors", {
-    defaultValue: initialColors,
+    defaultValue: colorThemeArray[0].colors,
   });
 
   async function handleContrast(color) {
@@ -29,9 +38,21 @@ function App() {
   }
 
   function addNewColor(newColor) {
+    const updatedColor = { ...newColor, id: uid() };
+
+    // Update colors
     setColors((prevColors) => {
-      return [{ ...newColor, id: uid() }, ...prevColors];
+      return [updatedColor, ...prevColors];
     });
+
+    // Update theme colors
+    setColorThemes((prevThemes) =>
+      prevThemes.map((theme) =>
+        theme.name === currentTheme
+          ? { ...theme, colors: [updatedColor, ...colors] }
+          : theme
+      )
+    );
   }
 
   function handleDelete(id) {
@@ -43,17 +64,75 @@ function App() {
   }
 
   function handleUpdate(updatedColor) {
-    setColors((prevColors) => {
-      return prevColors.map((color) =>
-        color.id === updatedColor.id ? updatedColor : color
-      );
+    // Step 1: Update colors
+    const newColors = colors.map((color) =>
+      color.id === updatedColor.id ? updatedColor : color
+    );
+
+    setColors(newColors);
+
+    // Step 2: Update theme colors
+    setColorThemes((prevThemes) =>
+      prevThemes.map((theme) =>
+        theme.name === currentTheme ? { ...theme, colors: newColors } : theme
+      )
+    );
+  }
+
+  function handleThemeChange(newTheme) {
+    setCurrentTheme(newTheme);
+    const themeColors = colorThemes.find(
+      (colorTheme) => colorTheme.name === newTheme
+    ).colors;
+    setColors(themeColors);
+  }
+
+  function handleNewTheme(newThemeName) {
+    const newTheme = { id: uid(), name: newThemeName, colors: [] };
+    setColorThemes((prevThemes) => {
+      return [...prevThemes, newTheme];
     });
+    setCurrentTheme(newThemeName);
+    setColors([]);
+  }
+
+  function handleEditTheme(editedName) {
+    setColorThemes((prevThemes) => {
+      return prevThemes.map((theme) => {
+        if (theme.name === currentTheme) {
+          return { ...theme, name: editedName };
+        }
+        return theme;
+      });
+    });
+    setCurrentTheme(editedName);
+  }
+
+  function handleDeleteTheme() {
+    setColorThemes((prevThemes) => {
+      return prevThemes.filter((theme) => {
+        return theme.name !== currentTheme;
+      });
+    });
+    setCurrentTheme("Default Theme");
+    const themeColors = colorThemes.find(
+      (colorTheme) => colorTheme.name === "Default Theme"
+    ).colors;
+    setColors(themeColors);
   }
 
   return (
     <>
-      <ColorForm handleSubmit={addNewColor} buttonName="ADD COLOR" />
       <h1>Theme Creator</h1>
+      <ThemeForm
+        onThemeChange={handleThemeChange}
+        currentTheme={currentTheme}
+        onNewTheme={handleNewTheme}
+        themes={colorThemes}
+        onEditTheme={handleEditTheme}
+        onDeleteTheme={handleDeleteTheme}
+      />
+      <ColorForm handleSubmit={addNewColor} buttonName="ADD COLOR" />
 
       {colors.length > 0 ? (
         colors.map((color) => {
