@@ -40,12 +40,10 @@ function App() {
   function addNewColor(newColor) {
     const updatedColor = { ...newColor, id: uid() };
 
-    // Update colors
     setColors((prevColors) => {
       return [updatedColor, ...prevColors];
     });
 
-    // Update theme colors
     setColorThemes((prevThemes) =>
       prevThemes.map((theme) =>
         theme.name === currentTheme
@@ -64,14 +62,12 @@ function App() {
   }
 
   function handleUpdate(updatedColor) {
-    // Step 1: Update colors
     const newColors = colors.map((color) =>
       color.id === updatedColor.id ? updatedColor : color
     );
 
     setColors(newColors);
 
-    // Step 2: Update theme colors
     setColorThemes((prevThemes) =>
       prevThemes.map((theme) =>
         theme.name === currentTheme ? { ...theme, colors: newColors } : theme
